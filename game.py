@@ -1,3 +1,5 @@
+import time
+
 import pygame
 
 pygame.init()
@@ -34,6 +36,26 @@ walkDown = [pygame.transform.scale(pygame.image.load('Graphics/down1.png'), (cha
             pygame.transform.scale(pygame.image.load('Graphics/down3.png'), (character_width, character_height))]
 
 standing = pygame.transform.scale(pygame.image.load('Graphics/Standing.png'), (character_width, character_height))
+standingRight = pygame.transform.scale(pygame.image.load('Graphics/right2.png'), (character_width, character_height))
+standingLeft = pygame.transform.scale(pygame.image.load('Graphics/left2.png'), (character_width, character_height))
+
+attackingStanceRight = [pygame.transform.scale(pygame.image.load('Graphics/attackRight1.png'), (character_width, character_height)),
+                        pygame.transform.scale(pygame.image.load('Graphics/attackRight2.png'), (character_width, character_height)),
+                        pygame.transform.scale(pygame.image.load('Graphics/attackRight3.png'), (character_width, character_height))]
+
+attackingStanceLeft = [pygame.transform.scale(pygame.image.load('Graphics/attackLeft1.png'), (character_width, character_height)),
+                       pygame.transform.scale(pygame.image.load('Graphics/attackLeft2.png'), (character_width, character_height)),
+                       pygame.transform.scale(pygame.image.load('Graphics/attackLeft3.png'), (character_width, character_height))]
+
+attackingStanceUp = [pygame.transform.scale(pygame.image.load('Graphics/attackUp1.png'), (character_width, character_height)),
+                        pygame.transform.scale(pygame.image.load('Graphics/attackUp2.png'), (character_width, character_height)),
+                        pygame.transform.scale(pygame.image.load('Graphics/attackUp3.png'), (character_width, character_height))]
+
+attackingStanceDown = [pygame.transform.scale(pygame.image.load('Graphics/attackDown1.png'), (character_width, character_height)),
+                       pygame.transform.scale(pygame.image.load('Graphics/attackDown2.png'), (character_width, character_height)),
+                       pygame.transform.scale(pygame.image.load('Graphics/attackDown3.png'), (character_width, character_height))]
+
+
 
 x = 350 #
 y = screen_length - (screen_length/2.5) # default position we want our object to start at
@@ -84,27 +106,94 @@ class user():
         self.up = False
         self.down = False
         self.walkCount = 0
+        self.madeFirstMove = False
+        self.lastMove = None
+        self.hitbox = (self.x, self.y + 2, width, height)
+        self.attacking = False
+        self.attackFrame = 0
 
 
     def updateChar(self,window): # Animation
 
+        if(self.attackFrame + 1 >= 10):
+            self.attackFrame = 0
+            self.attacking = False
         if(self.walkCount +1 >= 21):
             self.walkCount = 0
         if(self.left):
-            window.blit(walkLeft[self.walkCount//7], (self.x,self.y))
-            self.walkCount += 1
+            if(self.attacking == True):
+                window.blit(attackingStanceLeft[self.attackFrame//3], (self.x,self.y))
+                self.attackFrame += 1
+            else:
+                window.blit(walkLeft[self.walkCount//7], (self.x,self.y))
+                self.walkCount += 1
+            self.lastMove = "left"
+
         elif(self.right):
-            window.blit(walkRight[player.walkCount//7], (self.x,self.y))
-            self.walkCount += 1
+            if(self.attacking == True):
+                window.blit(attackingStanceRight[self.attackFrame//3], (self.x,self.y))
+                self.attackFrame += 1
+            else:
+                window.blit(walkRight[player.walkCount//7], (self.x,self.y))
+                self.walkCount += 1
+            self.lastMove = "right"
         elif(self.down):
-            window.blit(walkDown[self.walkCount//7], (self.x,self.y))
-            self.walkCount += 1
+            if(self.attacking == True):
+                window.blit(attackingStanceDown[self.attackFrame//3], (self.x,self.y))
+                self.attackFrame += 1
+            else:
+                window.blit(walkDown[self.walkCount//7], (self.x,self.y))
+                self.walkCount += 1
+            self.lastMove = "down"
 
         elif(self.up):
-            window.blit(walkUp[self.walkCount//7], (self.x,self.y))
-            self.walkCount += 1
+            if(self.attacking == True):
+                window.blit(attackingStanceUp[self.attackFrame//3], (self.x,self.y))
+                self.attackFrame += 1
+            else:
+                window.blit(walkUp[self.walkCount//7], (self.x,self.y))
+                self.walkCount += 1
+            self.lastMove = "up"
         else:
-            window.blit(standing, (self.x,self.y))
+            if(self.madeFirstMove == False):
+                if(self.attacking == True):
+                    window.blit(attackingStanceDown[self.attackFrame//3], (self.x,self.y))
+                    self.attackFrame += 1
+                else:
+                    window.blit(standing, (self.x,self.y))
+            else:
+
+                if(self.lastMove == "left"):
+                    if(self.attacking == True):
+                        window.blit(attackingStanceLeft[self.attackFrame//3], (self.x,self.y))
+                        self.attackFrame += 1
+                    else:
+                        window.blit(standingLeft, (self.x,self.y))
+
+                elif(self.lastMove == "right"):
+                    if(self.attacking == True):
+                        window.blit(attackingStanceRight[self.attackFrame//3], (self.x,self.y))
+                        self.attackFrame += 1
+                    else:
+                        window.blit(standingRight, (self.x,self.y))
+                elif(self.lastMove == "up"):
+                    if(self.attacking == True):
+                        window.blit(attackingStanceUp[self.attackFrame//3], (self.x,self.y))
+                        self.attackFrame += 1
+                    else:
+                        window.blit(walkUp[1], (self.x,self.y))
+                else:
+                    if(self.attacking == True):
+                        window.blit(attackingStanceDown[self.attackFrame//3], (self.x,self.y))
+                        self.attackFrame += 1
+                    else:
+                        window.blit(standing, (self.x,self.y))
+
+
+
+        self.hitbox = (self.x, self.y + 2, width, height)
+        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
+
 
 
 class Enemy:
@@ -121,6 +210,8 @@ class Enemy:
         self.down = False
         self.velocity = 1
         self.walkCount = 0
+        self.hitbox = (self.x + 15, self.y , width + 5, height + 7)
+        self.health = 100
 
     def updateMonster(self, window):
 
@@ -145,6 +236,9 @@ class Enemy:
             window.blit(walkUpEnemy[self.walkCount//12], (self.x,self.y))
             self.walkCount += 1
 
+        self.hitbox = (self.x + 15, self.y, width + 5, height + 7)
+        pygame.draw.rect(window, (255,0,0), self.hitbox,2)
+
 
 run = True
 
@@ -160,13 +254,20 @@ Goblin.append(Enemy(200, 320, 1.8*character_width, 1.2*character_height))
 Goblin[1].right = True
 Goblin[0].maxDistance -= 20
 
+global sha
+sha = 0
 
 
 def updateScreen():
     window.blit(background, (0,0))
     player.updateChar(window)
     for i in range(len(Goblin)):
-        Goblin[i].updateMonster(window)
+        if(Goblin[i].health > 0):
+            Goblin[i].updateMonster(window)
+        else:
+            temp = Goblin[i]
+            Goblin.pop(i)
+            del temp
 
     pygame.display.update()
 
@@ -179,6 +280,20 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: # allows you to exit
             run = False
+        elif(event.type == pygame.KEYDOWN):
+            if(event.key == pygame.K_c):
+                player.attacking = True
+                for i in range(len(Goblin)):
+                    if(player.hitbox[0] + player.hitbox[2] >= Goblin[i].hitbox[0]):
+                        if(player.hitbox[0] - player.hitbox[2] <= Goblin[i].hitbox[0] + .3*Goblin[i].hitbox[2]):
+                            if(player.hitbox[1] - player.hitbox[3] <= Goblin[i].hitbox[1] + .2*Goblin[i].hitbox[3]):
+                                if(player.hitbox[1] + player.hitbox[3] >= Goblin[i].hitbox[1]):
+                                    Goblin[i].health -= 10
+                                    print("hit", sha)
+                                    sha += 1
+
+
+
 
     keys = pygame.key.get_pressed() # gather user key info
 
@@ -229,6 +344,7 @@ while run:
         player.right = False
         player.up = False
         player.down = False
+        player.madeFirstMove = True
 
     elif(keys[pygame.K_RIGHT] and player.x < screen_width - player.width - player.velocity - 40):
         player.x += player.velocity
@@ -236,13 +352,15 @@ while run:
         player.left = False #
         player.up = False
         player.down = False
+        player.madeFirstMove = True
 
-    elif(keys[pygame.K_UP] and player.y > player.velocity + 200):
+    elif(keys[pygame.K_UP] and player.y > player.velocity + 190):
         player.y -= player.velocity
         player.right = False # for animation
         player.left = False #
         player.up = True
         player.down = False
+        player.madeFirstMove = True
 
     elif(keys[pygame.K_DOWN] and player.y < screen_length - player.height - player.velocity - 140):
         if(player.isJump == False):
@@ -251,6 +369,7 @@ while run:
             player.left = False #
             player.up = False
             player.down = True
+            player.madeFirstMove = True
     else:
         if(player.isJump == False):
             player.right = False #
@@ -259,12 +378,18 @@ while run:
             player.down = False
             player.walkCount = 0  #
 
+
+
     if(player.isJump == False): # if not(isJump)
         if(keys[pygame.K_SPACE]):
             player.isJump = True
             player.walkCount = 0
 
     else: # so we cannot jump twice in mid-air
+    #if we uncomment this then we cannot jump and attack, I am still debating whether we should be able to
+    # jump and attack at the same time:
+        #player.attacking = False
+        #player.attackFrame = 0
 
         if(player.jumpCount >= -player.jumpDistance):
 
