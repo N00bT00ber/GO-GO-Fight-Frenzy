@@ -348,7 +348,7 @@ class healthPotion:
         self.frame +=1
 
         self.range = (self.x,self.y, self.width,self.length)
-        pygame.draw.rect(window,(0,0,255),self.range,2)
+        #pygame.draw.rect(window,(0,0,255),self.range,2)
 
 
 
@@ -372,7 +372,7 @@ Goblin[1].lastMove = "right"
 
 oldGoblin = copy.deepcopy(Goblin)
 
-#potionCoin = healthPotion(500,200, character_width,character_width)
+potions = []
 
 def displayLevel(x,y):
     level = fontSettings.render("Round: " + str(player.level), True, (255,0,0))
@@ -388,7 +388,8 @@ def updateScreen():
     for i in range(len(Goblin)):
         Goblin[i].updateMonster(window)
 
-    #potionCoin.displayPotion(window)
+    for i in range(len(potions)):
+        potions[i].displayPotion(window)
 
     player.updateChar(window)
 
@@ -408,8 +409,36 @@ while run:
 
     clock.tick(42)
 
-    unwanted = []
 
+    if(player.health <= 25):
+        if(len(potions) == 0): # if there is not already a potion on the field
+            y = random.randint(1,20)
+            if(y >= 10):   # add a potion to a random part fo the field
+                potions.append(healthPotion(500 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+            elif(y < 10 and y >= 6):
+                potions.append(healthPotion(800 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+            else:
+                potions.append(healthPotion(320 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+    else:
+        if(len(potions) == 0):
+            if(random.randint(1,(5000 - 5*player.level)) == 517): # randomly generate a potion regardless of health status
+                                                                # odds of a random potion generation increase as the rounds do
+                y = random.randint(1,20)
+                if(y >= 10):   # add a potion to a random part fo the field
+                    potions.append(healthPotion(500 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+                elif(y < 10 and y >= 6):
+                    potions.append(healthPotion(800 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+                else:
+                    potions.append(healthPotion(320 + random.randint(-20,100), 280 + random.randint(-20,50), character_width, character_width))
+
+    if(len(potions) != 0):
+        if(player.hitbox[0] + player.hitbox[2] >= potions[0].range[0]): # if player grabs a potion
+            if(player.hitbox[0] - .1*player.hitbox[2] <= potions[0].range[0] + potions[0].range[2]):
+                if(player.hitbox[1] - .1*player.hitbox[3] <= potions[0].range[1] + potions[0].range[3]):
+                    if(player.hitbox[1] + player.hitbox[3] >= potions[0].range[1]):
+                        del potions[0]
+                        player.health = 100
+    unwanted = []
     for i in range(len(Goblin)): # only display goblins that are still alive
         if(Goblin[i].dead):
             unwanted.append(i)
@@ -429,6 +458,8 @@ while run:
 
 
     if(len(Goblin) == 0): # New Level
+        if(len(potions) != 0):
+            del potions[0] # remove any potion on the field
         player.level += 1
         player.health = 100 # Reset health
         y = random.randint(1,20)
@@ -604,7 +635,7 @@ while run:
                         Goblin[i].lastMove = "up"
                 else: # If the goblins are equal distance x and y from you then they will rapidly oscillate towards the user
                     # to fix this I added a cooldown "timer"
-                    # this also helps goblins from stacking on top of each other
+                    # this also helps goblins from stacking on top of each other when attacking player
                     Goblin[i].cooldown = 15
                     if(Goblin[i].left == True):
                         Goblin[i].x -= Goblin[i].velocity
@@ -705,29 +736,31 @@ while run:
             and player.hitbox[1] - .75*player.hitbox[3] <= 1.1*Goblin[i].bounds[1]
             and player.hitbox[1] + player.hitbox[3] >= Goblin[i].bounds[1]):
             if(Goblin[i].beenAttacked == True):
-                if(random.randint(1,15) == 1): # theoretically 1/15 odds , balances the game at higher levels
-                    print("collision")
-                    player.health -= 1
+                if(random.randint(1,25) == 1): # theoretically 1/55 odds , balances the game at higher levels
+                    player.health -= 2
 
 
     updateScreen()
 
-    if(player.health == 0):
+    if(player.health == 0): # Game over
+        font = pygame.font.Font('freesansbold.ttf', 100)
+
+        gameOver = font.render("GAME OVER", True, (255,0,0))
+        madeIt = fontSettings.render("you made it to round " + str(player.level), True, (255,0,0))
+
+        temp_surface = pygame.Surface(gameOver.get_size())
+        temp_surface2 = pygame.Surface(madeIt.get_size())
+        temp_surface.fill((255, 255, 255))
+        temp_surface2.fill((255, 255, 255))
+
+        window.blit(temp_surface, (250,250))
+        window.blit(temp_surface2, (370,350))
+        window.blit(gameOver,(250,250))
+        window.blit(madeIt, (370,350))
+
+        pygame.display.update()
+        time.sleep(7)
         break
 
 pygame.quit()
 
-# IF YOU WANT TO MAKE IT SO SPRITES CANNOT GO ONTOP OF EACH OTHER:
-
-#for i in range(len(Goblin)):
-#    if (player.hitbox[0] + player.hitbox[2] >= Goblin[i].bounds[0]
-#        and player.hitbox[0] - .5*player.hitbox[2] <= Goblin[i].bounds[0]
-#        and player.hitbox[1] - .75*player.hitbox[3] <= Goblin[i].bounds[1]
-#        and player.hitbox[1] + player.hitbox[3] >= Goblin[i].bounds[1]):
-
-#        player.collision = True
-#        break;
-#    else:
-#       player.collision = False
-
-# ^ This is code for the inner bounds to prevent sprites from stacking
