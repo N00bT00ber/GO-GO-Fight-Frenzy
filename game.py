@@ -488,7 +488,7 @@ while run:
         else:
             oldGoblin[-1].down = True
             oldGoblin[-1].lastMove = "down"
-        oldGoblin[-1].velocity += random.random() * random.randint(-1,1)
+        oldGoblin[-1].velocity += random.random()
         oldGoblin[-1].maxDistance += random.randint(-25,10)
         Goblin = copy.deepcopy(oldGoblin)
 
