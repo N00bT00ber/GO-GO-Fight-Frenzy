@@ -439,7 +439,7 @@ while run:
                 if(player.hitbox[1] - .1*player.hitbox[3] <= potions[0].range[1] + potions[0].range[3]):
                     if(player.hitbox[1] + player.hitbox[3] >= potions[0].range[1]):
                         del potions[0]
-                        if(player.health + 50 < 100):
+                        if(player.health + 35 < 100):
                             player.health += 35
                         else:
                             player.health = 100
