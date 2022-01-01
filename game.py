@@ -88,6 +88,22 @@ walkRightEnemy= [pygame.transform.scale(pygame.image.load('Graphics/Goblinright1
                  pygame.transform.scale(pygame.image.load('Graphics/Goblinright5.png'), (1.8 * character_width, 1.2 * character_height)),
                  pygame.transform.scale(pygame.image.load('Graphics/Goblinright6.png'), (1.8 * character_width, 1.2 * character_height))]
 
+enemyAttackRight = [pygame.transform.scale(pygame.image.load('Graphics/enemyAtackRight.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackRight2.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackRight3.png'), (1.8 * character_width, 1.2 * character_height))]
+
+enemyAttackLeft = [pygame.transform.scale(pygame.image.load('Graphics/enemyAtackLeft.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackLeft2.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackLeft3.png'), (1.8 * character_width, 1.2 * character_height))]
+
+enemyAttackUp = [pygame.transform.scale(pygame.image.load('Graphics/enemyAtackUp.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackUp2.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackUp3.png'), (1.8 * character_width, 1.2 * character_height))]
+
+enemyAttackDown = [pygame.transform.scale(pygame.image.load('Graphics/enemyAtackDown.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackDown2.png'), (1.8 * character_width, 1.2 * character_height)),
+                    pygame.transform.scale(pygame.image.load('Graphics/enemyAtackDown3.png'), (1.8 * character_width, 1.2 * character_height))]
+
 hit = pygame.transform.scale(pygame.image.load('Graphics/explosion.png'), (character_width, character_height))
 
 explosion  = [pygame.transform.scale(pygame.image.load('Graphics/tile000.png'), (character_width, character_height)),
@@ -111,6 +127,15 @@ explosion  = [pygame.transform.scale(pygame.image.load('Graphics/tile000.png'), 
               pygame.transform.scale(pygame.image.load('Graphics/tile018.png'), (character_width, character_height)),
               pygame.transform.scale(pygame.image.load('Graphics/tile019.png'), (character_width, character_height)),
               pygame.transform.scale(pygame.image.load('Graphics/tile020.png'), (character_width, character_height))]
+
+potion =[pygame.transform.scale(pygame.image.load('Graphics/health1.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health2.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health3.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health4.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health5.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health6.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health7.png'), (character_width, character_width)),
+         pygame.transform.scale(pygame.image.load('Graphics/health8.png'), (character_width, character_width))]
 
 fontSettings = pygame.font.Font('freesansbold.ttf', 32)
 
@@ -253,6 +278,7 @@ class Enemy:
         self.distanceFromUser = [0,0]
         self.attacking = False
         self.cooldown = 0
+        self.attackFrame = 0
 
 
     def updateMonster(self, window):
@@ -283,22 +309,50 @@ class Enemy:
                 window.blit(walkUpEnemy[self.walkCount//12], (self.x,self.y))
                 self.walkCount += 1
             else:
+                if(self.attackFrame + 1 >= 10):
+                    self.attackFrame = 0
                 if(self.lastMove == "left"):
-                    window.blit(walkLeftEnemy[5], (self.x,self.y))
+                    window.blit(enemyAttackLeft[self.attackFrame//3], (self.x,self.y))
+                    self.attackFrame +=1
                 elif(self.lastMove == "right"):
-                    window.blit(walkRightEnemy[5], (self.x,self.y))
+                    window.blit(enemyAttackRight[self.attackFrame//3], (self.x,self.y))
+                    self.attackFrame +=1
                 elif(self.lastMove == "up"):
-                    window.blit(walkUpEnemy[5], (self.x,self.y))
+                    window.blit(enemyAttackUp[self.attackFrame//3], (self.x,self.y))
+                    self.attackFrame +=1
                 elif(self.lastMove == "down"):
-                    window.blit(walkDownEnemy[5], (self.x,self.y))
+                    window.blit(enemyAttackDown[self.attackFrame//3], (self.x,self.y))
+                    self.attackFrame +=1
 
 
         self.hitbox = (self.x + 15, self.y, width + 5, height + 7)
-        #pygame.draw.rect(window, (255,0,0), self.hitbox,2)
-        self.bounds = (self.x + 22, self.y + 6 , width -10, height -10)
+        #pygame.draw.rect(window, (255,255,0), self.hitbox,2)
+        self.bounds = (self.x + 10 , self.y  , width + 10, height  + 10)
         #pygame.draw.rect(window, (255,0,0), self.bounds,2)
         self.blastRadius = (self.x, self.y, width + 10, width + 10)
         #pygame.draw.circle(window, (0,0,255), (self.x + 35, self.y + 28), width + 9,  2)
+
+class healthPotion:
+    def __init__(self,x,y,width,length):
+        self.x = x
+        self.y = y
+        self.range = (self.x,self.y, width,length)
+        self.frame = 0
+        self.width = width
+        self.length = length
+
+    def displayPotion(self,window):
+        if(self.frame +1 >= 24):
+            self.frame = 0
+        window.blit(potion[self.frame//4],(self.x,self.y))
+        self.frame +=1
+
+        self.range = (self.x,self.y, self.width,self.length)
+        pygame.draw.rect(window,(0,0,255),self.range,2)
+
+
+
+
 
 run = True
 
@@ -318,8 +372,10 @@ Goblin[1].lastMove = "right"
 
 oldGoblin = copy.deepcopy(Goblin)
 
+#potionCoin = healthPotion(500,200, character_width,character_width)
+
 def displayLevel(x,y):
-    level = fontSettings.render("Level: " + str(player.level), True, (255,0,0))
+    level = fontSettings.render("Round: " + str(player.level), True, (255,0,0))
     window.blit(level, (x,y))
 
 def displayHealth(x,y):
@@ -332,7 +388,11 @@ def updateScreen():
     for i in range(len(Goblin)):
         Goblin[i].updateMonster(window)
 
+    #potionCoin.displayPotion(window)
+
     player.updateChar(window)
+
+
 
     displayLevel(900,50)
     displayHealth(75,50)
@@ -354,11 +414,11 @@ while run:
         if(Goblin[i].dead):
             unwanted.append(i)
 
-    sortedUnwanted = sorted(unwanted, reverse= True) # MUST be sorted or else there will be an idnex put of range error if 2 goblins are killed at once
+    sortedUnwanted = sorted(unwanted, reverse=True) # MUST be sorted or else there will be an idnex put of range error if 2 goblins are killed at once
     for i in range(len(unwanted)): # avoid memory leaks by deleting dead goblins instead of just removing them from the list
         del Goblin[sortedUnwanted[i]]
 
-    switch = False
+    switch = False # If one Goblin gets attacked they all chase you
     for i in range(len(Goblin)):
         if(Goblin[i].beenAttacked):
             switch = True
@@ -392,7 +452,7 @@ while run:
         else:
             oldGoblin[-1].down = True
             oldGoblin[-1].lastMove = "down"
-        oldGoblin[-1].velocity += random.randint(-1,1) * random.random() *.25*len(oldGoblin)
+        oldGoblin[-1].velocity += random.random() * random.randint(-1,1)
         oldGoblin[-1].maxDistance += random.randint(-25,10)
         Goblin = copy.deepcopy(oldGoblin)
 
@@ -414,24 +474,28 @@ while run:
                                         Goblin[i].health -= 10
                                         player.hitEnemy = True
                                         player.hitCoordinates = (Goblin[i].x, Goblin[i].y)
+                                        Goblin[i].lastMove = "left"
 
                                     elif(player.x > Goblin[i].hitbox[0] and player.lastMove == "left"):
                                         Goblin[i].beenAttacked = True
                                         Goblin[i].health -= 10
                                         player.hitEnemy = True
                                         player.hitCoordinates = (Goblin[i].x + 30, Goblin[i].y)
+                                        Goblin[i].lastMove = "right"
 
                                     elif(player.y >= Goblin[i].hitbox[1] and player.lastMove == "up"):
                                         Goblin[i].beenAttacked = True
                                         Goblin[i].health -= 10
                                         player.hitEnemy = True
                                         player.hitCoordinates = (Goblin[i].x + 15, Goblin[i].y + 25)
+                                        Goblin[i].lastMove = "down"
 
                                     elif(player.y < Goblin[i].hitbox[1]  and player.lastMove == "down"):
                                         Goblin[i].beenAttacked = True
                                         Goblin[i].health -= 10
                                         player.hitEnemy = True
                                         player.hitCoordinates = (Goblin[i].x + 15 , Goblin[i].y - 20)
+                                        Goblin[i].lastMove = "up"
 
 
 
@@ -634,28 +698,16 @@ while run:
             player.isJump = False
             player.jumpCount = player.jumpDistance
 
-
-    for i in range(len(Goblin)):  # if within blast radius of an attacked goblin
-        if(Goblin[i].beenAttacked == True):
-            #Goblin[i].timer = timer.start()
-            if(player.hitbox[0] + player.hitbox[2] >= Goblin[i].blastRadius[0]):
-                if(player.hitbox[0] - player.hitbox[2] <= Goblin[i].blastRadius[0] + .6*Goblin[i].blastRadius[2]):
-                    if(player.hitbox[1] - player.hitbox[3] <= Goblin[i].blastRadius[1] + .5*Goblin[i].blastRadius[3]):
-                        if(player.hitbox[1] + player.hitbox[3] >= .95*Goblin[i].blastRadius[1]):
-                            pass
-                            #if time == the right time
-                                #player.health -= .5
-                                #print("inside blast Radius ")
-
+# Player being attacked
     for i in range(len(Goblin)):
        if(player.hitbox[0] + player.hitbox[2] >= Goblin[i].bounds[0]
-            and player.hitbox[0] - .5*player.hitbox[2] <= Goblin[i].bounds[0]
-            and player.hitbox[1] - .75*player.hitbox[3] <= Goblin[i].bounds[1]
+            and player.hitbox[0] - .7*player.hitbox[2] <= 1.1*Goblin[i].bounds[0]
+            and player.hitbox[1] - .75*player.hitbox[3] <= 1.1*Goblin[i].bounds[1]
             and player.hitbox[1] + player.hitbox[3] >= Goblin[i].bounds[1]):
             if(Goblin[i].beenAttacked == True):
-                if(random.randint(1,50) == 16): # theoretically 1/50 odds , balances the game at higher levels
+                if(random.randint(1,15) == 1): # theoretically 1/15 odds , balances the game at higher levels
                     print("collision")
-                    player.health -= 5
+                    player.health -= 1
 
 
     updateScreen()
