@@ -11,7 +11,7 @@ window = pygame.display.set_mode((screen_width,screen_length))
 
 clock = pygame.time.Clock()
 
-pygame.display.set_caption("Go-Go Ultra Fight Frenzy")
+pygame.display.set_caption("Goblin Frenzy")
 
 background = pygame.image.load('Graphics/battleback1.png')
 
@@ -379,6 +379,8 @@ def displayLevel(x,y):
     window.blit(level, (x,y))
 
 def displayHealth(x,y):
+    if player.health<= 0:
+        player.health = 0
     health = fontSettings.render("Health: " + str(player.health), True, (255,255,0))
     window.blit(health, (x,y))
 
@@ -437,7 +439,10 @@ while run:
                 if(player.hitbox[1] - .1*player.hitbox[3] <= potions[0].range[1] + potions[0].range[3]):
                     if(player.hitbox[1] + player.hitbox[3] >= potions[0].range[1]):
                         del potions[0]
-                        player.health = 100
+                        if(player.health + 50 < 100):
+                            player.health += 35
+                        else:
+                            player.health = 100
     unwanted = []
     for i in range(len(Goblin)): # only display goblins that are still alive
         if(Goblin[i].dead):
@@ -736,13 +741,13 @@ while run:
             and player.hitbox[1] - .75*player.hitbox[3] <= 1.1*Goblin[i].bounds[1]
             and player.hitbox[1] + player.hitbox[3] >= Goblin[i].bounds[1]):
             if(Goblin[i].beenAttacked == True):
-                if(random.randint(1,25) == 1): # theoretically 1/55 odds , balances the game at higher levels
+                if(random.randint(1,25) == 1): # theoretically 1/25 odds , balances the game at higher levels
                     player.health -= 2
 
 
     updateScreen()
 
-    if(player.health == 0): # Game over
+    if(player.health <= 0): # Game over
         font = pygame.font.Font('freesansbold.ttf', 100)
 
         gameOver = font.render("GAME OVER", True, (255,0,0))
