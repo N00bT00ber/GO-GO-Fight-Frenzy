@@ -4,9 +4,9 @@
 
 # Controls 
 
-**Jump-** Space Bar_
-**Attack-** c button_
-**Move-** Arrow Keys_
+**Jump-** Space Bar__
+**Attack-** c button__
+**Move-** Arrow Keys__
 
 
 # Gameplay/Game Logistics (1 minute video)
