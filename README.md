@@ -4,6 +4,9 @@
 
 **Play as a ninja and eliminate goblins as they chase and attack you. There are unlimited rounds of increasing difficulty (more goblins, faster goblins, etc.), similar to the Zombies game mode in Call-of-Duty.**
 
+# How to Play:
+
+**Download all the files and run game.py in your editor/IDE. Alternatively, you can use the command line and type "python game.py" once you download the repo.**
 
 # Controls 
 
