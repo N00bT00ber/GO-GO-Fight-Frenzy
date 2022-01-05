@@ -31,7 +31,13 @@ https://user-images.githubusercontent.com/55522995/148257877-dc0eed97-ac5f-4d3e-
 <img width="1099" alt="Screen Shot 2022-01-05 at 8 39 57 AM" src="https://user-images.githubusercontent.com/55522995/148258271-6bd5757e-94be-4280-afad-71775385cfc5.png">
 
 
+# Credits
 
+**Background:** https://opengameart.org/content/backgrounds-3
+
+**Goblin Sprites:** https://opengameart.org/content/lpc-goblin
+
+**Ninja Sprites:** https://opengameart.org/content/fumiko-complete-charset
 
 
 
