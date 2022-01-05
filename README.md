@@ -2,6 +2,9 @@
 
 # Description
 
+**Play as a ninja and eliminate goblins as they chase and attack you. There are unlimited rounds of increasing difficulty (more goblins, faster goblins, etc.), similar to the Zombies game mode in Call-of-Duty.**
+
+
 # Controls 
 
 **Jump-** Space Bar   
